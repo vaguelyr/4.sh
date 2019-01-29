@@ -148,8 +148,6 @@ fi
 # acts as in interface
 # lets us do stuff like applying verbose mode to every single wget call
 wget(){
-	#echo "$@" >> ./debug.txt
-	#command wget "$@" -q
 	command wget "$@" -q --tries=3 --timeout=4 --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) Gecko/20100101 Firefox/21.0"
 	# even randomizing or setting the useragent here is possible
 }
@@ -176,11 +174,7 @@ debugText(){
 	if [ "$debug" = "0" ] ; then
 		return
 	else
-		#if [ "$path" ] ; then
-			#echo DEBUG: $@ >> $path/debugtext
-		#fi	
 		echo DEBUG: $@ >&2
-		#echo DEBUG: got path $path >&2
 	fi	
 }
 
@@ -312,13 +306,6 @@ workThread(){
 		return
 	fi
 
-
-	# 404 check
-	#if [ "$(echo $threadPage | grep 'HTTP request sent, awaiting response... 404 Not Found' | grep 'ERROR 404: Not Found.')" ] ;then
-	#	cd $path
-	#	continue
-	#fi
-
 	#populates $threadName
 	findName 
 
@@ -350,7 +337,7 @@ workThread(){
 
 	echo
 
-	cd $path
+	cd "$path"
 }
 
 
@@ -399,7 +386,6 @@ if [ "$allBoards" ];then
 
 			boardsRunning=$(( boardsRunning + 1 ))
 
-			#catalogue=$(wget -O - http://boards.4chan.org/$board/catalog | sed -e 's/.*],\"alt\":\[//g' -e 's/],\"r\":\[.*//g' -e 's/,/\ /g')
 			findThreads
 
 			threadsRunning=0
@@ -436,8 +422,6 @@ while true ; do
 
 	threadsRunning=0
 
-	#catalogue=$(wget -O - http://boards.4chan.org/$board/catalog )
-	#catalogue=$(echo $catalogue  | sed -e 's/\"/\n/g' | grep -P "^[0-9]{4}" | grep -v "\." )
 	findThreads
 
 	for thread in $catalogue ; do
@@ -456,9 +440,3 @@ while true ; do
 		exit 0
 	fi
 done
-
-# learned
-# let for math - archaic, $(()) is prefered, easily memorable
-# $(< filename) for reading a file
-# forking stuff
-# debugging text is very useful

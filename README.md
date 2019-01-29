@@ -1,4 +1,8 @@
-<pre> 4chan downloader script - v. 3.5004
+<pre>4.sh was the first major thing I programmed and keep maintaining. 
+
+The only dependancies are bash and gnu coreutils, which come preinstalled with any good Linux distro. 
+
+4chan downloader script - v. 3.5004
 Usage 4.sh [option] -u <target>
 	Required: (unless -a is used)
 		-u <target> 	: target (board or thread) 
