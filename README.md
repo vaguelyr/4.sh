@@ -1,4 +1,4 @@
-4chan downloader script - v. 3.5004
+<pre> 4chan downloader script - v. 3.5004
 Usage 4.sh [option] -u <target>
 	Required: (unless -a is used)
 		-u <target> 	: target (board or thread) 
@@ -25,3 +25,4 @@ Usage 4.sh [option] -u <target>
 			download all of /wg/, two images at a time
 		4.sh -o -u http://boards.4chan.org/g/thread/39894014/
 			download everything from /g/'s sticky, once
+</pre>
