@@ -1,22 +1,8 @@
 #!/bin/bash
 # vague
 
-version=3.5004
-# 3.5004 - findImages() stopped working
-	# 	i think they changed cdns.
-	# 	fixed with shorter regex that doesnt reference cdn 
-	# 	also changed the comment for debug text enable
-# 3.50021 - found a bug
-	#	the thread name filter wasnt doing anything because 
-	#	it used continue to exit but it mostly runs forked
-	#	so continue would complain and it wouldnt exit?
-# 3.5003 - maintenance
-	# moved nopage check into workthread
-	# fixed findBoards
-	# created and fixed findThreads
-# 3.5002 - better fix. 
-# 3.5001 - bandaid fix for 4chan breaking catalogue html :(
-# 3.5000 - updated an old version to work like the newest one i lost
+version=3.50041 # 19-4-17
+
 
 usageMessage(){
 	cat << USAGE
@@ -33,6 +19,7 @@ Usage $0 [option] -u <target>
 		-o		: oneShot (once then exit)
 		-O 		: only output posts to stdout
 		-k		: dont make any new directories
+		-m 		: filter thread names by a given block list, comma delimited.
 		-l 		: download soundcloud,youtube, and bandcamp links (requires youtube-dl)
 		-z <number>	: boards at a time (for use with -a, default is 1)
 		-d <dirname>	: choose the directory to use
@@ -45,8 +32,10 @@ Usage $0 [option] -u <target>
 			download all of /g/
 		$0 -n 2 -u wg	
 			download all of /wg/, two images at a time
-		$0 -o -u http://boards.4chan.org/g/thread/39894014/
-			download everything from /g/'s sticky, once
+		$0 -o -t -u http://boards.4chan.org/g/thread/39894014/
+			download everything from /g/'s sticky, once, text only
+		$0 -i -m 'ignore,threads,with,these,words,in,the,titles' -u o
+			download images from /o/, filtering by those words
 USAGE
 exit
 }
@@ -70,13 +59,14 @@ boardsMax=1
 sleepBetweenThreads=10s
 outputText=0
 debug="0"
+wordFilter=""
 
 progressChar="." 
 textFile="./posts.txt"
 directory="4chan"
 
 # Process arguments
-while getopts ":itp:s:u:n:or:d:haz:lOkb" input ; do
+while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 	case $input in
 		O)# only output text to stdout
 			outputText=1
@@ -111,10 +101,13 @@ while getopts ":itp:s:u:n:or:d:haz:lOkb" input ; do
 		k)# dont make new directories
 			noDirectories="1"
 			;;
+		m)# word filter list
+			wordFilter=$(echo $OPTARG | sed -e 's/,/|/g')
+			;;
 		n)# max number of images at once
 			imagesMax=$OPTARG
 			;;
-		r)# max number of images at once
+		r)# max number of threads at once
 			threadsMax=$OPTARG
 			;;
 		s)# sleep time between threads
@@ -310,7 +303,7 @@ workThread(){
 	findName 
 
 	# Filter out threads
-	if [ "$(echo $threadName | grep -E "Porn|porn|Ass|ass|Butt|butt|Tit|tit|Boob|boob|Girl|girl|Sex|sex|Lets\ get\ you\ started" )" ] ; then
+	if [ ! -z "$wordFilter" ] && [ "$(echo $threadName | grep -E "$wordFilter" )" ] ; then
 		cd $path
 		return
 	fi
