@@ -15,51 +15,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
 version=3.50041 # 19-4-17
 
+## Colors
+black="tput setaf 0"
+red="tput setaf 1"
+green="tput setaf 2"
+yellow="tput setaf 3"
+blue="tput setaf 4"
+magenta="tput setaf 5"
+cyan="tput setaf 6"
+white="tput setaf 7"
 
-usageMessage(){
-	cat << USAGE
-4chan downloader script - v. $version
-Usage $0 [option] -u <target>
-	Required:
-		-u <target> 	: target (board or thread)
-	Options:
-		-a		: do all boards
-		-b 		: debug output
-		-h 		: show this message
-		-i		: only download images 
-		-t		: only download text
-		-o		: oneShot (once then exit)
-		-O 		: only output posts to stdout
-		-k		: dont make any new directories
-		-m 		: filter thread names by a given block list, comma delimited.
-		-l 		: download soundcloud,youtube, and bandcamp links (requires youtube-dl)
-		-z <number>	: boards at a time (for use with -a, default is 1)
-		-d <dirname>	: choose the directory to use
-		-n <number>	: number of images at a time (default is 10)
-		-r <number>	: number threads at a time (default is 1)
-		-s <number>	: time between threads (default is 1s)
-		-p <character>	: progress bar character (default is ".")
-	Examples:
-		$0 -u g 		
-			download all of /g/
-		$0 -n 2 -u wg	
-			download all of /wg/, two images at a time
-		$0 -o -t -u http://boards.4chan.org/g/thread/39894014/
-			download everything from /g/'s sticky, once, text only
-		$0 -i -m 'ignore,threads,with,these,words,in,the,titles' -u o
-			download images from /o/, filtering by those words
-USAGE
-exit
-}
-
-if [ -z "$1" ] ; then
-	usageMessage
-	exit
-fi
-
-# Defaults
+## Defaults
 target=""
 allBoards=""
 imagesOnly=0
@@ -78,6 +47,56 @@ wordFilter=""
 progressChar="." 
 textFile="./posts.txt"
 directory="4chan"
+
+
+usageMessage(){
+	cat << USAGE
+$(eval "$green")
+4chan downloader script - v. $version
+Usage $0 [option] -u <target>
+	Required:
+		$(eval "$white")
+		-u <target> 	: target (board or thread)
+	$(eval "$green")
+	Options:
+		$(eval "$white")
+		-a		: do all boards
+		-b 		: debug output
+		-h 		: show this message
+		-i		: only download images 
+		-t		: only download text
+		-o		: oneShot (once then exit)
+		-O 		: only output posts to stdout
+		-k		: dont make any new directories
+		-m 		: filter thread names by a given block list, comma delimited.
+		-l 		: download soundcloud,youtube, and bandcamp links (requires youtube-dl)
+		-z <number>	: boards at a time (for use with -a, default is 1)
+		-d <dirname>	: choose the directory to use
+		-n <number>	: number of images at a time (default is 10)
+		-r <number>	: number threads at a time (default is 1)
+		-s <number>	: time between threads (default is 1s)
+		-p <character>	: progress bar character (default is ".")
+	$(eval "$green")
+	Examples:
+		$(eval "$white")
+		$0 -u g 		
+			download all of /g/
+		$0 -n 2 -u wg	
+			download all of /wg/, two images at a time
+		$0 -o -t -u http://boards.4chan.org/g/thread/39894014/
+			download everything from /g/'s sticky, once, text only
+		$0 -i -m 'ignore,threads,with,these,words,in,the,titles' -u o
+			download images from /o/, filtering by those words
+USAGE
+exit
+}
+
+if [ -z "$1" ] ; then
+	usageMessage
+	exit
+fi
+
+
 
 # Process arguments
 while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
