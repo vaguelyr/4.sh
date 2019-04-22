@@ -1,8 +1,13 @@
-<pre>4.sh was the first major thing I programmed and keep maintaining. 
+## 4.sh
+A [4chan](https://4chan.org) utility/downloader script.
+Originally developed by [vague](https://github.com/vaguelyr), now expanded by friends.
 
+
+## Dependencies
 The only dependancies are bash and gnu coreutils, which come preinstalled with any good Linux distro. 
 
-4chan downloader script - v. 3.50041
+
+<pre>
 Usage ./4.sh [option] -u <target>
 	Required:
 		-u <target> 	: target (board or thread)
@@ -34,3 +39,5 @@ Usage ./4.sh [option] -u <target>
 			download images from /o/, filtering by those words
 
 </pre>
+
+GPL-3.0-or-later
