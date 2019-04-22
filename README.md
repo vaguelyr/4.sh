@@ -7,7 +7,7 @@ Originally developed by [vague](https://github.com/vaguelyr), now expanded by fr
 The only dependancies are bash and gnu coreutils, which come preinstalled with any good Linux distro. 
 
 
-## Examples
+## Usage
 <pre>
 Usage ./4.sh [option] -u <target>
 	Required:
