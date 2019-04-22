@@ -48,6 +48,13 @@ progressChar="."
 textFile="./posts.txt"
 directory="4chan"
 
+# Prevents threads that are deleted while we're working on them resulting in calling "cd .."
+# Prevents randomly ascending to higher directories 
+path=$(pwd) 
+
+
+
+## Usage
 
 usageMessage(){
 	cat << USAGE
@@ -97,89 +104,89 @@ if [ -z "$1" ] ; then
 fi
 
 
-
 # Process arguments
 while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 	case $input in
-		O)# only output text to stdout
+		O)# Only output text to stdout
 			outputText=1
 			textOnly="1"
 			noDirectories="1"
 			;;
-		b)# enable debugText
+		b)# Enable debugText
 			debug="1"
 			;;
-		p)# progress bar character
+		p)# Progress bar character
 			progressChar=$OPTARG	
 			;;
-		z)# boards at a time
+		z)# Boards taken at a time
 			boardsMax=$OPTARG	
 			;;
-		i)# images only
+		i)# Images only
 			imagesOnly="1"
 			;;
-		a)# images only
+		a)# Images only (all boards)
 			allBoards="1"
 			;;
-		t)# text only
+		t)# Text only
 			textOnly="1"
 			;;
-		d)# overall location
+		d)# Overall location
 			directory=$OPTARG
 			;;
-		h)# show usage message
+		h)# Show usage message
 			usageMessage
 			exit
 			;;
-		k)# dont make new directories
+		k)# Don't make new directories
 			noDirectories="1"
 			;;
-		m)# word filter list
+		m)# Word filter list
 			wordFilter=$(echo $OPTARG | sed -e 's/,/|/g')
 			;;
-		n)# max number of images at once
+		n)# Max number of images at once
 			imagesMax=$OPTARG
 			;;
-		r)# max number of threads at once
+		r)# Max number of threads at once
 			threadsMax=$OPTARG
 			;;
-		s)# sleep time between threads
+		s)# Sleep time between threads
 			sleepBetweenThreads=$OPTARG
 			;;
-		o)# oneShot
+		o)# Run once then exit
 			oneShot="1"
 			;;
-		l)# process links
+		l)# Process links
 			processLinks=1
 			;;
-		u)# target
+		u)# Target
 			target=$OPTARG
 			;;
-		?)# error	
+		?)# Error	
 			usageMessage
 			;;
 	esac
 done
 
 
-# do we have a usable target?
+# Do we have a usable target?
 if [ -z "$target" -a -z "$allBoards" ] ; then
 	echo "Error: No target. (Specifiy with -u <target>)"
 	exit
 fi
 
-# ====================== functions
 
-# the wget wrapper
-# acts as in interface
-# lets us do stuff like applying verbose mode to every single wget call
+
+#============================= Functions ===============================#
+
+
+# wget wrapper, acts as interface so we may do things like apply verbose mode to every call
 wget(){
 	command wget "$@" -q --tries=3 --timeout=4 --user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:21.0) Gecko/20100101 Firefox/21.0"
-	# even randomizing or setting the useragent here is possible
+	# TODO even randomizing or setting the useragent here is possible
 }
 
 
-# make a directory (if we are suppose to) and cd to it
+# Makes a directory (If we are suppose to) and cd's to it.
 mkcd(){
 	if [ ! "$noDirectories" = 1 ] ; then
 		mkdir -p "$1"
@@ -194,8 +201,9 @@ mkcd(){
 	debugText "mkcd: dir $1"
 }
 
-# debug output
-# easily get debug text where regular text would break dirty hacks
+
+# Enables debug output
+# Easily lets us get debug text where regular text would break dirty hacks
 debugText(){
 	if [ "$debug" = "0" ] ; then
 		return
@@ -204,9 +212,10 @@ debugText(){
 	fi	
 }
 
-# Find the threadname from $threadPage for the folder
+
+# Finds the threadname from $threadPage for the folder
 findName(){  
-	# whats the point of finding threadName if your not making any folders or using it anywhere?
+	# TODO whats the point of finding threadName if your not making any folders or using it anywhere?
 
 	# Find the initial name from the page title
 	threadName=$(echo $threadPage | sed -e 's/.*application\/rss+xml\"//' -e 's/text\/javascript.*//' -e 's/.*\/\ -\ //' -e 's/..title..script\ type..//' )
@@ -221,7 +230,8 @@ findName(){
 
 }
 
-# output all the posts
+
+# Scrapes all the posts and outputs them
 findPosts(){  
 	if [ "$imagesOnly" == "1" ] ; then
 		return
@@ -239,7 +249,8 @@ findPosts(){
 	debugText "findPosts"
 }
 
-# download all the images
+
+# Downloads all the images within our current thread
 findImages(){ 
 	if [ "$textOnly" == "1" ] ; then
 		return
@@ -247,8 +258,9 @@ findImages(){
 	echo -n Downloading images
 
 	
+	# TODO
 	#allImages=$( echo $threadPage | sed -e 's/<div\ class=\"file\"/\n/g' | sed -e 's/\ target=\"_blank\".*//g' -e 's/.*href=\"//g' -e 's/.$//g' | grep 4cdn.org )
-	# i think they might have just changed the cdn text
+	# TODO FIXME i think they might have just changed the cdn text
 	allImages=$(echo $threadPage |  sed -e 's/File/\nFile/g' | grep File:.*target -o  | sed -e 's/\"\ .*//' | grep href | sed -e 's/.*\/\///' )
 
 
@@ -264,6 +276,7 @@ findImages(){
 		wget -N $image 
 
 		num=$((num + 1)) # better
+		# TODO FIXME - confirm we are at the best solution, then remove these commented ones
 		#let num=num+1 # shellbuiltin for math. faster
 		#num=$( echo "$num + 1" | bc ) # increment num
 
@@ -276,7 +289,8 @@ findImages(){
 
 }	
 
-# find and process urls
+
+# Finds and processes URLs within our current thread.
 findLinks(){ 
 	if [ ! "$processLinks" = 1 ];then
 		return
@@ -284,17 +298,21 @@ findLinks(){
 
 	debugText "findLinks"
 
-	# download all the bandcamp links
+
+	# Download all the bandcamp links
 	youtube-dl $( echo $threadPage | sed -e 's/http/\n&/g' | sed -e 's/<wbr>//g'| grep bandcamp.com\/ | sed -e 's/<br>.*//g' -e 's/<\/blockquote>.*//g' ) 2>/dev/null &
-	# download all the soundcloud links
+
+	# Download all the soundcloud links
 	youtube-dl $( echo $threadPage | sed -e 's/https:\/\/soundcloud/\n&/g' -e 's/<wbr>//g' | sed -e 's/<.*//g' ) 2>/dev/null&
-	# download all the youtube links
+
+	# Download all the youtube links
 	youtube-dl $( echo $threadPage | sed -e 's/youtube.com/\n&/g' |sed -e 's/<wbr>//g' | sed -e 's/<.*//g' -e 's/\s.*//g' )  2>/dev/null &
 
 	wait
 }
 
-# dynamically find the boards so we dont have to
+
+# Finds the current location of the boards, so we don't have to.
 findBoards(){
 	boards="$(wget -q -O - http://www.4chan.org/ | grep class=\"boardlink\" | sed -e 's/.*.org\///'  -e 's/\/.*//' | sort -u)"
 
@@ -305,10 +323,11 @@ findBoards(){
 }
 
 
-# populate $catalogue with all the threads
+# Populates $catalogue with all the current threads
 findThreads(){
 	debugText "findThreads in board $board"
 
+	# TODO - figure out best solution here
 	# also works
 	#catalogue=$(wget -O - http://boards.4chan.org/$board/catalog )
 	#catalogue=$(echo $catalogue  | sed -e 's/\"/\n/g' | grep -P "^[0-9]{4}" | grep -v "\." )
@@ -318,13 +337,15 @@ findThreads(){
 
 }
 
-# process the thread
+
+# Processes our current thread
 workThread(){
 	debugText "workThread: start"
 
-	threadPage=$(wget -O - http://boards.4chan.org/$board/thread/$1 2>&1) # download page
+	# download page
+	threadPage=$(wget -O - http://boards.4chan.org/$board/thread/$1 2>&1)
 
-	# Error?
+	# Do we have an error?
 	if [ -z "$threadPage" ] ; then
 		debugText "workThread: empty page check is empty"
 		echo no page
@@ -332,7 +353,7 @@ workThread(){
 		return
 	fi
 
-	#populates $threadName
+	# Find our current thread name and populate $threadName with it.
 	findName 
 
 	# Filter out threads
@@ -341,7 +362,7 @@ workThread(){
 		return
 	fi
 
-	# if findName fails, it is assigned to the thread number
+	# If findName failed, we have a thread number instead.
 	if [ -z "$threadName" ] ; then
 		threadName=$1
 	fi
@@ -350,13 +371,13 @@ workThread(){
 
 	echo ============================================ $'\n'http://boards.4chan.org/$board/thread/$1 $'\n'$threadName
 
-	# download all the text
+	# Download all the text
 	findPosts &
 
-	# download all the images	
+	# Download all the images	
 	findImages &
 	
-	# download all the soundcloud links	
+	# Download all the soundcloud links	
 	findLinks &
 
  	wait 
@@ -367,17 +388,16 @@ workThread(){
 }
 
 
-# ====================== end functions
+#=========================== End Functions =============================#
 
+
+
+# Make our directory to hold what we download.
 mkcd "$directory"
 
-# Prevents threads that are deleted while we're working on them resulting in calling "cd .."
-# Prevents randomly ascending to higher directories 
-path=$(pwd) 
+### Process arguments and run.
 
-## Process arguments and run
-
-# thread
+## One Thread Mode
 if [ "$(echo $target | grep http.*org )" ] ;then 
 	debugText "single thread: final loop enter"
 
@@ -395,7 +415,7 @@ if [ "$(echo $target | grep http.*org )" ] ;then
 	done
 fi
 
-# all boards
+## All Boards Mode
 if [ "$allBoards" ];then
 	debugText "all boards: final loop enter"
 
@@ -441,7 +461,7 @@ fi
 board=$target
 mkcd "$board"
 
-# Entire board
+## Single Board Mode
 while true ; do
 	echo ============================================	
 	debugText "Entire board: final loop enter"
