@@ -50,7 +50,7 @@ Usage ./4.sh [option] -u <target>
 - Add report of how many images/posts were downloaded each update
 - Add report of thread information to a file / option for stdout too
 - Have special chars in the thread name show up correctly
-
+- Consider adding/moving to <pre>set -x</pre> for debugging instead of just printing text.
 
 
 

@@ -112,7 +112,7 @@ while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 			textOnly="1"
 			noDirectories="1"
 			;;
-		b)# Enable debugText
+		b)# Enable debug text mode
 			debug="1"
 			;;
 		p)# Progress bar character
@@ -202,8 +202,7 @@ mkcd(){
 }
 
 
-# Enables debug output
-# Easily lets us get debug text where regular text would break dirty hacks
+# If debug text mode is enabled, outputs all arguments to stderr.
 debugText(){
 	if [ "$debug" = "0" ] ; then
 		return
@@ -392,7 +391,7 @@ workThread(){
 
 
 
-# Make our directory to hold what we download.
+# Make our directory to hold what we download, then cd to it.
 mkcd "$directory"
 
 ### Process arguments and run.
