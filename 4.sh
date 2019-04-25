@@ -31,9 +31,9 @@ white="tput setaf 7"
 ## Defaults
 target=""
 allBoards=""
-imagesOnly=0
-textOnly=0
-oneshot=0
+downloadText="1"
+downloadImages="1"
+oneshot="0"
 noDirectories=0
 processLinks=0
 imagesMax=10
@@ -48,8 +48,7 @@ progressChar="."
 textFile="./posts.txt"
 directory="4chan"
 
-# Prevents threads that are deleted while we're working on them resulting in calling "cd .."
-# Prevents randomly ascending to higher directories 
+# Used to prevent ascending to a higher directory if a thread is deleted while we're working on it
 path=$(pwd) 
 
 
@@ -98,6 +97,8 @@ USAGE
 exit
 }
 
+
+# No argument, so inform our user of what they should do.
 if [ -z "$1" ] ; then
 	usageMessage
 	exit
@@ -108,8 +109,8 @@ fi
 while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 	case $input in
 		O)# Only output text to stdout
-			outputText=1
-			textOnly="1"
+			outputText="1"
+			downloadImages="0"
 			noDirectories="1"
 			;;
 		b)# Enable debug text mode
@@ -121,14 +122,14 @@ while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 		z)# Boards taken at a time
 			boardsMax=$OPTARG	
 			;;
-		i)# Images only
-			imagesOnly="1"
+		i)# Download only images
+			downloadText="0"
 			;;
-		a)# Images only (all boards)
+		a)# All Boards mode
 			allBoards="1"
 			;;
 		t)# Text only
-			textOnly="1"
+			downloadImages="0"
 			;;
 		d)# Overall location
 			directory=$OPTARG
@@ -156,7 +157,7 @@ while getopts ":itp:s:u:n:or:d:haz:lOkbm:" input ; do
 			oneShot="1"
 			;;
 		l)# Process links
-			processLinks=1
+			processLinks="1"
 			;;
 		u)# Target
 			target=$OPTARG
@@ -238,14 +239,10 @@ findName(){
 
 # Scrapes all the posts and outputs them
 findPosts(){  
-	if [ "$imagesOnly" == "1" ] ; then
-		return
-	fi
 
 	if [ "$outputText" == "1" ] ; then
 		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' | grep "blockquote class=\"postMessage\"" | sed -e 's_./blockquote></div.*__g' | sed -e 's/.*postMessage\"\ //g' -e 's/<span\ class=\"quote\">&gt;/>/g' | sed -e 's/id=\"m/=========\ m/g' -e 's/m[0-9]*\">/&\n/' -e 's/\">/\ =============/' -e 's/<\/a>//g' -e 's/<br>/\n/g' -e 's/<\/span>//g' -e 's/&#039;/'"'"'/g' -e 's/&quot;/\"/g' -e 's/&gt;/>/g' -e 's/<wbr>//g' | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' | grep -v asdftHisPartIsActuallyrEallyWeirdasdff
 	else
-		echo -n "Text, "
 
 		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' | grep "blockquote class=\"postMessage\"" | sed -e 's_./blockquote></div.*__g' | sed -e 's/.*postMessage\"\ //g' -e 's/<span\ class=\"quote\">&gt;/>/g' | sed -e 's/id=\"m/=========\ m/g' -e 's/m[0-9]*\">/&\n/' -e 's/\">/\ =============/' -e 's/<\/a>//g' -e 's/<br>/\n/g' -e 's/<\/span>//g' -e 's/&#039;/'"'"'/g' -e 's/&quot;/\"/g' -e 's/&gt;/>/g' -e 's/<wbr>//g' | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' | grep -v asdftHisPartIsActuallyrEallyWeirdasdff > $textFile
 
@@ -257,12 +254,6 @@ findPosts(){
 
 # Downloads all the images within our current thread
 findImages(){ 
-	if [ "$textOnly" == "1" ] ; then
-		return
-	fi
-	echo -n Downloading images
-
-	
 	# TODO
 	#allImages=$( echo $threadPage | sed -e 's/<div\ class=\"file\"/\n/g' | sed -e 's/\ target=\"_blank\".*//g' -e 's/.*href=\"//g' -e 's/.$//g' | grep 4cdn.org )
 	# TODO FIXME i think they might have just changed the cdn text
@@ -285,11 +276,12 @@ findImages(){
 		#let num=num+1 # shellbuiltin for math. faster
 		#num=$( echo "$num + 1" | bc ) # increment num
 
-		if [ $num -ge $imagesMax ] ; then
-			echo -n "$progressChar"
-			wait
-			num=0
-		fi
+		# TODO Refactor this out into showing progress no matter the mode we are in
+		#if [ $num -ge $imagesMax ] ; then
+		#	echo -n "$progressChar"
+		#	wait
+		#	num=0
+		#fi
 	done
 
 }	
@@ -297,10 +289,6 @@ findImages(){
 
 # Finds and processes URLs within our current thread.
 findLinks(){ 
-	if [ ! "$processLinks" = 1 ];then
-		return
-	fi
-
 	debugText "findLinks"
 
 
@@ -376,14 +364,25 @@ workThread(){
 
 	echo ============================================ $'\n'http://boards.4chan.org/$board/thread/$1 $'\n'$threadName
 
-	# Download all the text
-	findPosts &
 
-	# Download all the images	
-	findImages &
+	echo -n "Downloading "
+	# Download text if requested
+	if [ "$downloadText" == "1" ] ; then
+		echo -n "Text "
+		findPosts &
+	fi
+
+	# Download images if requested
+	if [ "$downloadImages" == "1" ] ; then
+		echo -n "Images "
+		findImages &
+	fi
 	
-	# Download all the soundcloud links	
-	findLinks &
+	# Process links if requested
+	if [ "$processLinks" == "1" ] ; then
+		echo "Links"
+		findLinks &
+	fi
 
  	wait 
 
@@ -412,7 +411,7 @@ if [ "$(echo $target | grep http.*org )" ] ;then
 	while true; do 
 		workThread $thread
 
-		if [ "$oneShot" = 1 ] ; then
+		if [ "$oneShot" == 1 ] ; then
 			exit 0
 		fi
 		debugText "sleeping $sleepBetweenThreads"
@@ -456,7 +455,7 @@ if [ "$allBoards" ];then
 			sleep 1s
 		done
 
-		if [ "$oneShot" = 1 ] ; then
+		if [ "$oneShot" == "1" ] ; then
 			exit 0
 		fi
 
@@ -487,7 +486,7 @@ while true ; do
 		sleep "$sleepBetweenThreads"
 	done
 
-	if [ "$oneShot" = 1 ] ; then
+	if [ "$oneShot" == "1" ] ; then
 		exit 0
 	fi
 done
