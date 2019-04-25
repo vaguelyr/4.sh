@@ -203,6 +203,7 @@ mkcd(){
 
 
 # If debug text mode is enabled, outputs all arguments to stderr.
+# Otherwise, does nothing.
 debugText(){
 	if [ "$debug" = "0" ] ; then
 		return
@@ -224,6 +225,11 @@ findName(){
 
 	# Find the date to prevent duplicated threadnames
 	threadName=$threadName\ $( echo $threadPage| sed -e 's/Link\ to\ this\ post.*//g' -e 's/.*>//g' -e 's/<.*//g' -e 's/(.*)/||/' -e 's_/_-_g' )
+
+	# Convert html character entities to their UTF-8 equivalents if we have recode.
+	if [ ! -z "$(command -v recode)" ] ; then
+		threadName=$(echo $threadName | recode html..utf-8)
+	fi
 
 	debugText "findName: got name $threadName"
 

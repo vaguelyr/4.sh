@@ -4,7 +4,8 @@ Originally developed by [vague](https://github.com/vaguelyr), now expanded by fr
 
 
 ## Dependencies
-The only dependancies are bash and gnu coreutils, which come preinstalled with any good Linux distro. 
+The only dependencies are `bash` and GNU `coreutils`, which come preinstalled with any good Linux distro. 
+Optionally, `recode` is used for prettier output.
 
 
 ## Usage
@@ -43,18 +44,14 @@ Usage ./4.sh [option] -u <target>
 
 
 ## Ideas for the Future
+- Address TODOs and FIXMEs within the code
 - Add option to remove images deleted, as they are likely not worth keeping.
 - Add prettyfication options for the update status. E.g. Let the lines of ='s be changed.
 - Update the update status with what you are downloading, particularly yt/sc/bc links, etc
 - Date past versisons / add a changelog file
 - Add report of how many images/posts were downloaded each update
 - Add report of thread information to a file / option for stdout too
-- Have special chars in the thread name show up correctly
-- Consider adding/moving to <pre>set -x</pre> for debugging instead of just printing text.
-
-
-
-
+- Consider adding/moving to `set -x` for debugging instead of just printing text.
 
 
 GPL-3.0-or-later
