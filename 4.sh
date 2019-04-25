@@ -56,7 +56,7 @@ path=$(pwd)
 ## Usage
 
 usageMessage(){
-	cat << USAGE
+	cat <<USAGE
 $(eval "$green")
 4chan downloader script - v. $version
 Usage $0 [option] -u <target>
@@ -219,13 +219,25 @@ findName(){
 	# TODO whats the point of finding threadName if your not making any folders or using it anywhere?
 
 	# Find the initial name from the page title
-	threadName=$(echo $threadPage | sed -e 's/.*application\/rss+xml\"//' -e 's/text\/javascript.*//' -e 's/.*\/\ -\ //' -e 's/..title..script\ type..//' )
+	threadName=$(echo $threadPage | sed -e 's/.*application\/rss+xml\"//' \
+					    -e 's/text\/javascript.*//' \
+					    -e 's/.*\/\ -\ //' \
+					    -e 's/..title..script\ type..//' )
 
 	# Clean up punctuation
-	threadName=$(echo $threadName | sed -e 's/\&#039;//g' -e 's/\///g' -e 's/\&gt;//g' -e 's/\&amp;/and/g' -e 's/\&quot;//g' -e 's/........$//g')
+	threadName=$(echo $threadName | sed -e 's/\&#039;//g' \
+					    -e 's/\///g' \
+					    -e 's/\&gt;//g' \
+					    -e 's/\&amp;/and/g' \
+					    -e 's/\&quot;//g' \
+					    -e 's/........$//g')
 
 	# Find the date to prevent duplicated threadnames
-	threadName=$threadName\ $( echo $threadPage| sed -e 's/Link\ to\ this\ post.*//g' -e 's/.*>//g' -e 's/<.*//g' -e 's/(.*)/||/' -e 's_/_-_g' )
+	threadName=$threadName\ $( echo $threadPage| sed -e 's/Link\ to\ this\ post.*//g' \
+							 -e 's/.*>//g' \
+							 -e 's/<.*//g' \
+							 -e 's/(.*)/||/' \
+							 -e 's_/_-_g' )
 
 	# Convert html character entities to their UTF-8 equivalents if we have recode.
 	if [ ! -z "$(command -v recode)" ] ; then
@@ -240,11 +252,44 @@ findName(){
 # Scrapes all the posts and outputs them
 findPosts(){  
 
+	# FIXME XXX the "reallyweirdasdf" part?
 	if [ "$outputText" == "1" ] ; then
-		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' | grep "blockquote class=\"postMessage\"" | sed -e 's_./blockquote></div.*__g' | sed -e 's/.*postMessage\"\ //g' -e 's/<span\ class=\"quote\">&gt;/>/g' | sed -e 's/id=\"m/=========\ m/g' -e 's/m[0-9]*\">/&\n/' -e 's/\">/\ =============/' -e 's/<\/a>//g' -e 's/<br>/\n/g' -e 's/<\/span>//g' -e 's/&#039;/'"'"'/g' -e 's/&quot;/\"/g' -e 's/&gt;/>/g' -e 's/<wbr>//g' | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' | grep -v asdftHisPartIsActuallyrEallyWeirdasdff
+		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' \
+				 | grep "blockquote class=\"postMessage\"" \
+				 | sed -e 's_./blockquote></div.*__g' \
+				 | sed -e 's/.*postMessage\"\ //g' \
+				       -e 's/<span\ class=\"quote\">&gt;/>/g' \
+				 | sed -e 's/id=\"m/=========\ m/g' \
+				       -e 's/m[0-9]*\">/&\n/' \
+				       -e 's/\">/\ =============/' \
+				       -e 's/<\/a>//g' \
+				       -e 's/<br>/\n/g' \
+				       -e 's/<\/span>//g' \
+				       -e 's/&#039;/'"'"'/g' \
+				       -e 's/&quot;/\"/g' \
+				       -e 's/&gt;/>/g' \
+				       -e 's/<wbr>//g' \
+				 | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' \
+				 | grep -v asdftHisPartIsActuallyrEallyWeirdasdff
 	else
 
-		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' | grep "blockquote class=\"postMessage\"" | sed -e 's_./blockquote></div.*__g' | sed -e 's/.*postMessage\"\ //g' -e 's/<span\ class=\"quote\">&gt;/>/g' | sed -e 's/id=\"m/=========\ m/g' -e 's/m[0-9]*\">/&\n/' -e 's/\">/\ =============/' -e 's/<\/a>//g' -e 's/<br>/\n/g' -e 's/<\/span>//g' -e 's/&#039;/'"'"'/g' -e 's/&quot;/\"/g' -e 's/&gt;/>/g' -e 's/<wbr>//g' | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' | grep -v asdftHisPartIsActuallyrEallyWeirdasdff > $textFile
+		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' \
+				 | grep "blockquote class=\"postMessage\"" \
+				 | sed -e 's_./blockquote></div.*__g' \
+				 | sed -e 's/.*postMessage\"\ //g' \
+				       -e 's/<span\ class=\"quote\">&gt;/>/g' \
+				 | sed -e 's/id=\"m/=========\ m/g' \
+				       -e 's/m[0-9]*\">/&\n/' \
+				       -e 's/\">/\ =============/' \
+				       -e 's/<\/a>//g' \
+				       -e 's/<br>/\n/g' \
+				       -e 's/<\/span>//g' \
+				       -e 's/&#039;/'"'"'/g' \
+				       -e 's/&quot;/\"/g' \
+				       -e 's/&gt;/>/g' \
+				       -e 's/<wbr>//g' \
+				 | sed -e 's/quotelink\">/asdftHisPartIsActuallyrEallyWeirdasdff\n/g' \
+				 | grep -v asdftHisPartIsActuallyrEallyWeirdasdff > $textFile
 
 	fi
 
@@ -257,7 +302,11 @@ findImages(){
 	# TODO
 	#allImages=$( echo $threadPage | sed -e 's/<div\ class=\"file\"/\n/g' | sed -e 's/\ target=\"_blank\".*//g' -e 's/.*href=\"//g' -e 's/.$//g' | grep 4cdn.org )
 	# TODO FIXME i think they might have just changed the cdn text
-	allImages=$(echo $threadPage |  sed -e 's/File/\nFile/g' | grep File:.*target -o  | sed -e 's/\"\ .*//' | grep href | sed -e 's/.*\/\///' )
+	allImages=$(echo $threadPage |  sed -e 's/File/\nFile/g' \
+				     | grep File:.*target -o \
+				     | sed -e 's/\"\ .*//' \
+				     | grep href \
+				     | sed -e 's/.*\/\///' )
 
 
 	debugText "findImages"
@@ -293,13 +342,22 @@ findLinks(){
 
 
 	# Download all the bandcamp links
-	youtube-dl $( echo $threadPage | sed -e 's/http/\n&/g' | sed -e 's/<wbr>//g'| grep bandcamp.com\/ | sed -e 's/<br>.*//g' -e 's/<\/blockquote>.*//g' ) 2>/dev/null &
+	youtube-dl $( echo $threadPage | sed -e 's/http/\n&/g' \
+				       | sed -e 's/<wbr>//g' \
+				       | grep bandcamp.com\/ \
+			               | sed -e 's/<br>.*//g' \
+			      		     -e 's/<\/blockquote>.*//g' ) 2>/dev/null &
 
 	# Download all the soundcloud links
-	youtube-dl $( echo $threadPage | sed -e 's/https:\/\/soundcloud/\n&/g' -e 's/<wbr>//g' | sed -e 's/<.*//g' ) 2>/dev/null&
+	youtube-dl $( echo $threadPage | sed -e 's/https:\/\/soundcloud/\n&/g' \
+				     	     -e 's/<wbr>//g' \
+				       | sed -e 's/<.*//g' ) 2>/dev/null&
 
 	# Download all the youtube links
-	youtube-dl $( echo $threadPage | sed -e 's/youtube.com/\n&/g' |sed -e 's/<wbr>//g' | sed -e 's/<.*//g' -e 's/\s.*//g' )  2>/dev/null &
+	youtube-dl $( echo $threadPage | sed -e 's/youtube.com/\n&/g' \
+				       | sed -e 's/<wbr>//g' \
+				       | sed -e 's/<.*//g' \
+				             -e 's/\s.*//g' )  2>/dev/null &
 
 	wait
 }
@@ -307,7 +365,10 @@ findLinks(){
 
 # Finds the current location of the boards, so we don't have to.
 findBoards(){
-	boards="$(wget -q -O - http://www.4chan.org/ | grep class=\"boardlink\" | sed -e 's/.*.org\///'  -e 's/\/.*//' | sort -u)"
+	boards="$(wget -q -O - http://www.4chan.org/ | grep class=\"boardlink\" \
+						     | sed -e 's/.*.org\///' \
+						     	   -e 's/\/.*//' \
+						     | sort -u)"
 
         # filter out the boards we dont want
         boards="$(echo $boards | sed -e 's/\ f\ //')"
@@ -325,7 +386,12 @@ findThreads(){
 	#catalogue=$(wget -O - http://boards.4chan.org/$board/catalog )
 	#catalogue=$(echo $catalogue  | sed -e 's/\"/\n/g' | grep -P "^[0-9]{4}" | grep -v "\." )
 
-	catalogue=$(wget -q -O -  "http://boards.4chan.org/$board/catalog" | sed -e 's/{\"date/\n/g' | sed -e 's/.*,//' -e 's/^.//' -e 's/\"://' | sed -e 's/.*\"://' | grep -v false)
+	catalogue=$(wget -q -O -  "http://boards.4chan.org/$board/catalog" | sed -e 's/{\"date/\n/g' \
+									   | sed -e 's/.*,//' \
+										 -e 's/^.//' \
+										 -e 's/\"://' \
+								           | sed -e 's/.*\"://' \
+									   | grep -v false)
 
 
 }
@@ -405,8 +471,10 @@ mkcd "$directory"
 if [ "$(echo $target | grep http.*org )" ] ;then 
 	debugText "single thread: final loop enter"
 
-	board=$(echo $target | sed -e 's/\/thread\/[0-9]*.*//' -e 's/.*\///g' )
-	thread=$(echo $target | sed -e 's/.*thread\///g' -e 's/\/.*//g')
+	board=$(echo $target | sed -e 's/\/thread\/[0-9]*.*//' \
+				   -e 's/.*\///g' )
+	thread=$(echo $target | sed -e 's/.*thread\///g' \
+				    -e 's/\/.*//g')
 
 	while true; do 
 		workThread $thread
