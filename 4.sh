@@ -445,7 +445,7 @@ workThread(){
 	fi
 	
 	# Process links if requested
-	if [ "$processLinks" == "1" ] ; then
+	if [ "$processLinks" == "1" ] && [ ! -z "$(command -v youtube-dl)" ] ; then
 		echo "Links"
 		findLinks &
 	fi

@@ -6,7 +6,7 @@ Originally developed by [vague](https://github.com/vaguelyr), now expanded by fr
 ## Dependencies
 The only dependencies are `bash` and GNU `coreutils`, which come preinstalled with any good Linux distro. 
 
-Optionally, `recode` is used for prettier output.
+Optionally, `recode` is used for prettier output, and `youtube-dl` for downloading media links found within the posts.
 
 
 ## Usage
