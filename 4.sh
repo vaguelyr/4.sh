@@ -34,7 +34,7 @@ allBoards=""
 downloadText="1"
 downloadImages="1"
 oneshot="0"
-noDirectories=0
+noDirectories="0"
 processLinks=0
 imagesMax=10
 threadsMax=1
@@ -49,7 +49,7 @@ textFile="./posts.txt"
 directory="4chan"
 
 # Used to prevent ascending to a higher directory if a thread is deleted while we're working on it
-path=$(pwd) 
+path=""
 
 
 
@@ -97,6 +97,9 @@ USAGE
 exit
 }
 
+
+# Update our path
+path="$(pwd)/$directory"
 
 # No argument, so inform our user of what they should do.
 if [ -z "$1" ] ; then
@@ -189,7 +192,7 @@ wget(){
 
 # Makes a directory (If we are suppose to) and cd's to it.
 mkcd(){
-	if [ ! "$noDirectories" = 1 ] ; then
+	if [ ! "$noDirectories" == "1" ] ; then
 		mkdir -p "$1"
 	fi
 
