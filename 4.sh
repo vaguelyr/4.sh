@@ -19,14 +19,8 @@
 version=3.50041 # 19-4-17
 
 ## Colors
-black="tput setaf 0"
-red="tput setaf 1"
-green="tput setaf 2"
-yellow="tput setaf 3"
-blue="tput setaf 4"
-magenta="tput setaf 5"
-cyan="tput setaf 6"
-white="tput setaf 7"
+green="\e[32m"
+white="\e[97m"
 
 ## Defaults
 target=""
@@ -54,18 +48,19 @@ path=""
 
 
 ## Usage
+# cat won't interpret the escape sequences for colors
 
 usageMessage(){
 	cat <<USAGE
-$(eval "$green")
 4chan downloader script - v. $version
-Usage $0 [option] -u <target>
+$(echo -e "${green}")
+Usage: $0 [option] -u <target>
 	Required:
-		$(eval "$white")
+    $(echo -e "${white}")
 		-u <target> 	: target (board or thread)
-	$(eval "$green")
+    $(echo -e "${green}")
 	Options:
-		$(eval "$white")
+        $(echo -e "${white}")
 		-a		: do all boards
 		-b 		: debug output
 		-h 		: show this message
@@ -82,9 +77,9 @@ Usage $0 [option] -u <target>
 		-r <number>	: number threads at a time (default is 1)
 		-s <number>	: time between threads (default is 1s)
 		-p <character>	: progress bar character (default is ".")
-	$(eval "$green")
+    $(echo -e "${green}")
 	Examples:
-		$(eval "$white")
+        $(echo -e "${white}")
 		$0 -u g 		
 			download all of /g/
 		$0 -n 2 -u wg	
