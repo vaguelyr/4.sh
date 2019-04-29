@@ -46,6 +46,9 @@ Usage ./4.sh [option] -u <target>
 
 ## Ideas for the Future
 - Address TODOs and FIXMEs within the code
+- Associate images and posts
+- Preserve filenames for images (especially relevant for filename threads)
+- Preserve names and tripcodes
 - Add progress indicator, no matter the mode we are in.
 - Add option to remove images deleted, as they are likely not worth keeping.
 - Add prettyfication options for the update status. E.g. Let the lines of ='s be changed.
@@ -54,6 +57,10 @@ Usage ./4.sh [option] -u <target>
 - Add report of how many images/posts were downloaded each update
 - Add report of thread information to a file / option for stdout too
 - Consider adding/moving to `set -x` for debugging instead of just printing text.
-
+- Continuous monitoring of a board with downloading of any thread matching given regex
+- Add option to download banners and contest banners
+- Put all downloaded content within respective folders
+- Add option to download sitewide misc data, popular threads shown on the site home,blog, etc
+- Add option for all boards mode to be all sfw or nsfw boards
 
 GPL-3.0-or-later
