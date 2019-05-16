@@ -1,6 +1,6 @@
 #!/bin/bash
 # 4.sh - Flexible & Fast 4chan downloader and archiver script
-# Copyright (C) 2017 vague
+# Copyright (C) 2014 vague
 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
