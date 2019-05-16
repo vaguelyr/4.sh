@@ -34,3 +34,5 @@ Usage ./4.sh [option] -u <target>
 			download images from /o/, filtering by those words
 
 </pre>
+
+GPL-2.0-only
