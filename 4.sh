@@ -53,14 +53,10 @@ path=""
 usageMessage(){
 	cat <<USAGE
 4chan downloader script - v. $version
-$(echo -e "${green}")
 Usage: $0 [option] -u <target>
 	Required:
-    $(echo -e "${white}")
 		-u <target> 	: target (board or thread)
-    $(echo -e "${green}")
 	Options:
-        $(echo -e "${white}")
 		-a		: do all boards
 		-b 		: debug output
 		-h 		: show this message
@@ -77,9 +73,7 @@ Usage: $0 [option] -u <target>
 		-r <number>	: number threads at a time (default is 1)
 		-s <number>	: time between threads (default is 1s)
 		-p <character>	: progress bar character (default is ".")
-    $(echo -e "${green}")
 	Examples:
-        $(echo -e "${white}")
 		$0 -u g 		
 			download all of /g/
 		$0 -n 2 -u wg	
