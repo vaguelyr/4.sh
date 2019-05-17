@@ -187,7 +187,7 @@ wget(){
 
 # Makes a directory (If we are suppose to) and cd's to it.
 mkcd(){
-	if [ ! "$noDirectories" == "1" ] ; then
+	if [ ! "$noDirectories" = "1" ] ; then
 		mkdir -p "$1"
 	fi
 
@@ -231,11 +231,11 @@ findName(){
 					    -e 's/........$//g')
 
 	# Find the date to prevent duplicated threadnames
-	threadName=$threadName\ $( echo $threadPage| sed -e 's/Link\ to\ this\ post.*//g' \
-							 -e 's/.*>//g' \
-							 -e 's/<.*//g' \
-							 -e 's/(.*)/||/' \
-							 -e 's_/_-_g' )
+	threadName=$threadName\ $( echo $threadPage | sed -e 's/Link\ to\ this\ post.*//g' \
+							        -e 's/.*>//g' \
+							        -e 's/<.*//g' \
+							        -e 's/(.*)/||/' \
+							        -e 's_/_-_g' )
 
 	# Convert html character entities to their UTF-8 equivalents if we have recode.
 	if [ ! -z "$(command -v recode)" ] ; then
@@ -251,7 +251,7 @@ findName(){
 findPosts(){  
 
 	# FIXME XXX the "reallyweirdasdf" part?
-	if [ "$outputText" == "1" ] ; then
+	if [ "$outputText" = "1" ] ; then
 		echo $threadPage | sed 's/class=\"nameBlock\"/\n/g' \
 				 | grep "blockquote class=\"postMessage\"" \
 				 | sed -e 's_./blockquote></div.*__g' \
@@ -318,10 +318,7 @@ findImages(){
 
 		wget -N $image 
 
-		num=$((num + 1)) # better
-		# TODO FIXME - confirm we are at the best solution, then remove these commented ones
-		#let num=num+1 # shellbuiltin for math. faster
-		#num=$( echo "$num + 1" | bc ) # increment num
+		num=$((num + 1))
 
 		# TODO Refactor this out into showing progress no matter the mode we are in
 		#if [ $num -ge $imagesMax ] ; then
@@ -431,22 +428,22 @@ workThread(){
 
 	echo -n "Downloading "
 	# Download text if requested
-	if [ "$downloadText" == "1" ] ; then
+	if [ "$downloadText" = "1" ] ; then
 		echo -n "Text "
-		findPosts &
-	fi
+		findPosts
+	fi &
 
 	# Download images if requested
-	if [ "$downloadImages" == "1" ] ; then
+	if [ "$downloadImages" = "1" ] ; then
 		echo -n "Images "
-		findImages &
-	fi
+		findImages
+	fi &
 	
 	# Process links if requested
-	if [ "$processLinks" == "1" ] && [ ! -z "$(command -v youtube-dl)" ] ; then
+	if [ "$processLinks" = "1" ] && [ ! -z "$(command -v youtube-dl)" ] ; then
 		echo "Links"
-		findLinks &
-	fi
+		findLinks
+	fi &
 
  	wait 
 
@@ -477,7 +474,7 @@ if [ "$(echo $target | grep http.*org )" ] ;then
 	while true; do 
 		workThread $thread
 
-		if [ "$oneShot" == 1 ] ; then
+		if [ "$oneShot" = 1 ] ; then
 			exit 0
 		fi
 		debugText "sleeping $sleepBetweenThreads"
@@ -521,7 +518,7 @@ if [ "$allBoards" ];then
 			sleep 1s
 		done
 
-		if [ "$oneShot" == "1" ] ; then
+		if [ "$oneShot" = "1" ] ; then
 			exit 0
 		fi
 
@@ -552,7 +549,7 @@ while true ; do
 		sleep "$sleepBetweenThreads"
 	done
 
-	if [ "$oneShot" == "1" ] ; then
+	if [ "$oneShot" = "1" ] ; then
 		exit 0
 	fi
 done
