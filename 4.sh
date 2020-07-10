@@ -291,14 +291,11 @@ findPosts(){
 
 # Downloads all the images within our current thread
 findImages(){ 
-	# TODO
-	#allImages=$( echo $threadPage | sed -e 's/<div\ class=\"file\"/\n/g' | sed -e 's/\ target=\"_blank\".*//g' -e 's/.*href=\"//g' -e 's/.$//g' | grep 4cdn.org )
-	# TODO FIXME i think they might have just changed the cdn text
-	allImages=$(echo $threadPage |  sed -e 's/File/\nFile/g' \
-				     | grep File:.*target -o \
-				     | sed -e 's/\"\ .*//' \
-				     | grep href \
-				     | sed -e 's/.*\/\///' )
+	allImages=$(echo $threadPage    | sed -e 's?\s?\n?g' \
+                                        | sed -ne '/class="file"/,/class="fileThumb"/ p' \
+                                        | grep href \
+                                        | cut -d'"' -f 2 \
+                                        | sed -e 's!^//!!g' )
 
 
 	debugText "findImages"
@@ -420,7 +417,7 @@ workThread(){
 	echo ============================================ $'\n'http://boards.4chan.org/$board/thread/$1 $'\n'$threadName
 
 
-	echo -n "Downloading "
+	echo -n "Downloading: "
 	# Download text if requested
 	if [ "$downloadText" = "1" ] ; then
 		echo -n "Text "
@@ -469,6 +466,7 @@ if [ "$(echo $target | grep http.*org )" ] ;then
 		workThread $thread
 
 		if [ "$oneShot" = 1 ] ; then
+                        debugText "one thread mode: exit: oneShot"
 			exit 0
 		fi
 		debugText "sleeping $sleepBetweenThreads"
