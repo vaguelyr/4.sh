@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-version=3.50041 # 19-4-17
+version=3.5005 # 20-7-10
 
 ## Colors
 green="\e[32m"
